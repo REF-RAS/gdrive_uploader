@@ -1,0 +1,12 @@
+dash
+dash_bootstrap_components
+dash_daq
+dash_auth
+plotly
+numpy==1.24.4
+pandas==2.0.3
+pyyaml==6.0.1
+rospkg==1.5.0
+wrapt
+PyDrive
+watchdog

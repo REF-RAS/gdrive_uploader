@@ -1,0 +1,7 @@
+<launch>
+    <arg name="mode" default=""/> 
+    <include file="$(find gdrive_uploader)/launch/main.launch">
+        <arg name="run_uploader" default="true" />    
+        <arg name="mode" default="$(arg mode)"/>  
+    </include>
+</launch>
