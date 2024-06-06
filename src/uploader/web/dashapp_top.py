@@ -37,6 +37,7 @@ APP = dash.Dash(__name__,
                 suppress_callback_exceptions=True)
 
 APP.config['suppress_callback_exceptions'] = True
+_APP_NAME = 'Google Drive Uploader'
 
 # -- load the pages for the dash application
 from . import page_console, page_db_browse
@@ -64,11 +65,11 @@ class DashAppTop():
                         dbc.NavItem(dbc.NavLink('Console', href='/page_console')),  
                         dbc.NavItem(dbc.NavLink('DB', href='/page_db_browser')),                                              
                     ],
-                    brand=html.Div([html.H3('Google Drive Uploader'), html.H6('Robotics and Autonomous Systems Group, REF, RI, Queensland University of Technology')]),
+                    brand=html.Div([html.H3(_APP_NAME), html.H6('Robotics and Autonomous Systems Group, REF, RI, Queensland University of Technology')]),
                     brand_href='/page_console', color='#ffe6cc', className='fs-4 text')
 
         self._navbar_simple = dbc.NavbarSimple(
-                    brand=html.H3('Google Drive Uploader'), color='#99cccc', className='fs-4 text')      
+                    brand=html.H3(_APP_NAME), color='#99cccc', className='fs-4 text')      
 
         self._nav_placeholder = html.Div(id='nav_placeholder')
         
@@ -91,8 +92,9 @@ class DashAppTop():
                
     def start(self):
         rospy.loginfo('operation agent: starting the dash flask server')
-        self.app.run_server(host=self.DASH_HOST, port=self.DASH_PORT, debug=CONFIG.get('capturer.web.debug.mode', True))
-
+        # self.app.run_server(host=self.DASH_HOST, port=self.DASH_PORT, debug=CONFIG.get('uploader.web.debug.mode', True))
+        self.app.run_server(host=self.DASH_HOST, port=self.DASH_PORT, debug=False)
+        
     def stop(self, *args, **kwargs):
         rospy.loginfo('operation agent: the dash flask server is being shutdown')
         time.sleep(2)
@@ -126,7 +128,7 @@ class DashAppTop():
     
     @SERVER.route("/<path>")
     def update_title(path):
-        APP.title = 'Google Drive Uploader'
+        APP.title = _APP_NAME
         return APP.index()
         
     

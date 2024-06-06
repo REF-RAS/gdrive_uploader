@@ -87,13 +87,22 @@ The configuration file `config/uploader_config.yaml` must be edited so that the 
 uploader.mode: web   # web or headless
 ```
 Determines whether the bagfile capturer provides a web interface (`web`) or no interface (`headless`). Other values will cause an error.
+
+```yaml
+# filestore path
+uploader.filestore.local: /home/qcr/Insync/Bagfiles
+uploader.filestore.remote: /Bagfiles
+```
+The `uploader.filestore.local` specifies the local directory where new files are to be detected and uploaded. Note that the uploader is only interested in _new_ files. However, touching the files can force the uploader to consider them as new files.
+
+The `uploader.filestore.remote` specifies the target folder to receive the uploaded file on Google Drive.
+
 ```yaml
 uploader.web.host: 0.0.0.0
 uploader.web.port: 8070
-uploader.web.debug.mode: True       # whether the web interface provides debugging information
 uploader.web.launch_browser: False  # whether to launch the web browser when the application starts
 ```
-Determines the host IP and the port number of the web interface. The `True` value for the `debug.mode` instructs the web interface to provide debugging information. Changing from `False` to `True` for `uploader.web.launch_browser` tells the application to launch the web browser and point it at the given host IP and port number.
+Determines the host IP and the port number of the web interface. Changing from `False` to `True` for `uploader.web.launch_browser` tells the application to launch the web browser and point it at the given host IP and port number.
 
 ```yaml
 uploader.delay: 30 # seconds

@@ -66,7 +66,7 @@ def drop_tables(db_file):
     return db_tools.update_with_script_no_exception(db_file, DROP_TABLES_SQL)
 
 def create_tables(db_file):
-    """ A convenient function for creating all database tables for the bagfiles capturer
+    """ A convenient function for creating all database tables for the application
 
     :param db_file: The path to the sqlite db file
     :return: The error as a string if any

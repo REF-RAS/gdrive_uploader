@@ -22,7 +22,7 @@ from tools.logging_tools import logger
 import tools.file_tools as file_tools
 import uploader.model as model
 from uploader.model import DAO, CONFIG, UploaderDAO
-from uploader.dash.dashapp_top import DashAppTop
+from uploader.web.dashapp_top import DashAppTop
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from watchdog.observers import Observer
@@ -72,7 +72,7 @@ class GDriveUploader(object):
         # prepare operation mode
         self.operation_mode = rospy.get_param('mode')
         if self.operation_mode is None or self.operation_mode == "":
-            self.operation_mode = CONFIG.get('capturer.mode', 'web')
+            self.operation_mode = CONFIG.get('uploader.mode', 'web')
         # create lock for synchronization
         self.state_lock = threading.Lock()
         self.log_lock = threading.Lock()
@@ -82,17 +82,15 @@ class GDriveUploader(object):
         # setup watchdog
         self.filestore_local = CONFIG.get('uploader.filestore.local', None)
         self.filestore_remote = CONFIG.get('uploader.filestore.remote', '/')
-        self.logfiles_folder = CONFIG.get('uploader.logfilestore', 'Logfiles')
-        self.logfiles_folder = os.path.join(self.filestore_local, self.logfiles_folder)
         if self.filestore_local is None:
-            logger.warning(f'GDriveUploader: The local filestore location is not defined in the config file')
+            logger.warning(f'{type(self).__name__}: The local filestore location is not defined in the config file')
             sys.exit(1)
         self.watchdog_thread = self.run_watchdog(self.filestore_local)
         # start uploader
         self._to_stop_uploader = False
         self.uploader_thread = threading.Thread(target=self.run_uploader)
         self.uploader_thread.start()
-        logger.info(f'GDriveUploader: Started one-way sync from the local "{self.filestore_local}" to the folder "{self.filestore_remote}" on Google Drive.')
+        logger.info(f'{type(self).__name__}: Started one-way sync from the local "{self.filestore_local}" to the folder "{self.filestore_remote}" on Google Drive.')
 
         if self.operation_mode == 'web':
             # create the dash application and start it and block the thread
@@ -101,7 +99,7 @@ class GDriveUploader(object):
         elif self.operation_mode == 'headless':
             pass
         else:
-            logger.warning(f'GDriveUploader (__init__): invalid uploader.mode ("{self.operation_mode}") in config')
+            logger.warning(f'{type(self).__name__} (__init__): invalid uploader.mode ("{self.operation_mode}") in config')
             sys.exit(0)
         # spin the application if the mode is headless
         try:
@@ -137,7 +135,7 @@ class GDriveUploader(object):
             gdrive = GoogleDrive(gauth) # Create GoogleDrive instance with authenticated GoogleAuth instance
             return gdrive
         except Exception as e:
-            logger.warning(f'GDriveUploader: Failed to load credentials for connecting to a Google Drive account.')
+            logger.warning(f'{type(self).__name__}: Failed to load credentials for connecting to a Google Drive account.')
             # logger.info(f'Reason: {traceback.format_exc()}')
             return None
         
@@ -155,6 +153,8 @@ class GDriveUploader(object):
     
     # executes the uploader thread
     def run_uploader(self):
+        # clear the upload queue
+        DAO.clear_upload_queue()        
         while not self._to_stop_uploader:
             time.sleep(1.0)
             # if the google drive connection is not ready, change the state to ERROR
@@ -173,7 +173,7 @@ class GDriveUploader(object):
             remote_path = next_to_upload[0]['remote_path']
             file_size = (os.stat(local_path).st_size)
             start_time = time.time()
-            logger.info(f'GDriveUploader (run_uploader): Uploading file {local_path} to {remote_path}')
+            logger.info(f'{type(self).__name__} (run_uploader): Uploading file {local_path} to {remote_path}')
             # check if the folder_id of the remote path is cached in a previous operation
             if remote_path in self.folder_id_cache:
                 folder_id = self.folder_id_cache.get(remote_path)
@@ -197,16 +197,16 @@ class GDriveUploader(object):
                     # update the database
                     DAO.remove_upload_file(local_path)
                     DAO.add_upload_record(local_path, file_size, upload_duration)
-                    logger.info(f'GDriveUploader (run_uploader): Uploading file SUCCESSFUL (rate: {file_size / upload_duration / 1000} MB/s)')
+                    logger.info(f'{type(self).__name__} (run_uploader): Uploading file SUCCESSFUL (rate: {file_size / upload_duration / 1000} MB/s)')
                     model.STATE.update(model.SystemStates.READY)
                     continue
                 except Exception as e:
-                    logger.warning(f'GDriveUploader (run_uploader): Error: {traceback.format_exc()}')
+                    logger.warning(f'{type(self).__name__} (run_uploader): Error: {traceback.format_exc()}')
             # handle upload errors
             DAO.error_delay_upload_timestamp(local_path, int(time.time()) + (self.uploader_delay * (next_to_upload[0]['error_count'] + 2)))
-            logger.info(f'GDriveUploader (run_uploader): Uploading file FAILED')
+            logger.info(f'{type(self).__name__} (run_uploader): Uploading file FAILED')
             if next_to_upload[0]['error_count'] >= self.uploader_max_error_count:
-                logger.info(f'GDriveUploader (run_uploader): Maximum error reached for uploading {local_path}')
+                logger.info(f'{type(self).__name__} (run_uploader): Maximum error reached for uploading {local_path}')
             model.STATE.update(model.SystemStates.READY)
 
     # internal function for retrieve the file_id given the filename and the remote folder
@@ -256,7 +256,7 @@ class GDriveUploader(object):
         return folder_id
 
 # ---------------------------------------------------------
-# The main program for running the bagfiles capturer
+# The main program for running the application
 if __name__ == '__main__':
     rospy.init_node('gdrive_uploader_agent')
     the_agent = GDriveUploader()

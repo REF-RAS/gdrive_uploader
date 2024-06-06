@@ -25,7 +25,7 @@ from tools.logging_tools import logger
 # This class models the management and backup of db files and the folder that contains the files
 class DBFileManager():
     DB_FOLDER_NAME = 'sqlite3'
-    DB_FILENAME = 'capturer.db'
+    DB_FILENAME = 'uploader.db'
     def __init__(self):
         try:
             self.user_home = os.path.expanduser('~') 
@@ -155,6 +155,10 @@ class UploaderDAO():
     def remove_upload_file(self, local_path:str):
         sql = 'DELETE FROM upload_queue WHERE local_path = ?'
         return db_tools.update(self.db_file, sql, (local_path,))
+
+    def clear_upload_queue(self):
+        sql = 'DELETE FROM upload_queue'
+        return db_tools.update(self.db_file, sql)
 
     # --------- the upload record
     def add_upload_record(self, local_path:str, file_size:int, duration:int):

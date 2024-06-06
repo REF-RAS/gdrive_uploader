@@ -20,7 +20,7 @@ from uploader.model import DAO, DBFM
 # This program is used to clear drop all tables in the
 # database and re-create them
 if __name__ == '__main__':
-    logger.info(f'GoogleDrive File Uploader: Reset Database')
+    logger.info(f'Reset Database')
     logger.warning(f'Warning! All data will be cleared!')
     if '-y' in sys.argv or '-yes' in sys.argv:
        answer = 'Y'
@@ -31,4 +31,4 @@ if __name__ == '__main__':
         errors = database_setup.create_tables(DAO.db_file)
         if errors is not None:
             logger.error(f'Error in create tabless: {errors}')
-        logger.info(f'Bagfile Capturer: Reset Database Completed')
+        logger.info(f'Reset Database Completed')

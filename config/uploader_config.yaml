@@ -5,14 +5,12 @@ uploader.mode: web # web or headless
 # filestore path
 uploader.filestore.local: /home/qcr/Insync/Bagfiles
 uploader.filestore.remote: /Bagfiles
-uploader.logfilestore: Logfiles
 # Upload delay
 uploader.delay: 30 # seconds
 uploader.error_count.max: 5 
 # Dash Agent (uploader) setting
 uploader.web.host: 0.0.0.0
 uploader.web.port: 8070
-uploader.web.debug.mode: True
 uploader.web.launch_browser: False
 uploader.web.auth: True   # Authentication required if web mode
 # Main system timers for the uploader implemented by Dash
