@@ -2,9 +2,15 @@
 ---
 # Operation Mode
 uploader.mode: web # web or headless
-# filestore path
-uploader.filestore.local: /home/qcr/Insync/Bagfiles
+# the local filestore path where new or modified files are uploaded
+uploader.filestore.local: /home/qcr/Bagfiles
+# the target folder on the google drive
 uploader.filestore.remote: /Bagfiles
+# exclude files with suffixes and prefixes
+uploader.ignore.suffix:
+  - .active
+uploader.ignore.prefix:
+  - '~'
 # Upload delay
 uploader.delay: 30 # seconds
 uploader.error_count.max: 5 
@@ -12,7 +18,6 @@ uploader.error_count.max: 5
 uploader.web.host: 0.0.0.0
 uploader.web.port: 8070
 uploader.web.launch_browser: False
-uploader.web.auth: True   # Authentication required if web mode
 # Main system timers for the uploader implemented by Dash
 uploader.system.timer: 1  # seconds
 uploader.console.refresh: 5  # seconds

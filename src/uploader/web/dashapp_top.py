@@ -63,7 +63,7 @@ class DashAppTop():
         self._navbar_with_menu = dbc.NavbarSimple(
                     children=[
                         dbc.NavItem(dbc.NavLink('Console', href='/page_console')),  
-                        dbc.NavItem(dbc.NavLink('DB', href='/page_db_browser')),                                              
+                        # dbc.NavItem(dbc.NavLink('DB', href='/page_db_browser')),                                              
                     ],
                     brand=html.Div([html.H3(_APP_NAME), html.H6('Robotics and Autonomous Systems Group, REF, RI, Queensland University of Technology')]),
                     brand_href='/page_console', color='#ffe6cc', className='fs-4 text')
@@ -108,8 +108,8 @@ class DashAppTop():
             try: 
                 if pathname == '/page_console':
                     page_content = self._console_page.layout()          
-                elif pathname == '/page_db_browser':
-                    page_content = self._db_browse_page.layout()                                        
+                # elif pathname == '/page_db_browser':
+                #     page_content = self._db_browse_page.layout()                                        
                 elif pathname == '/': 
                     page_content = self._console_page.layout()
                 else: # if redirected to unknown link

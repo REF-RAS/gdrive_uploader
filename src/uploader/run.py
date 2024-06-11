@@ -35,6 +35,24 @@ class CustomFileSystemEventHandler(FileSystemEventHandler):
         self.filestore_path = filestore_path
         self.remote_filestore_path = CONFIG.get('uploader.filestore.remote', '/')
         self.uploader_delay = CONFIG.get('uploader.delay', 30)
+        # setup ignore list
+        self.ignore_suffix = CONFIG.get('uploader.ignore.suffix', None)
+        if self.ignore_suffix is not None and type(self.ignore_suffix) == str:
+            self.ignore_suffix = [self.ignore_suffix]
+        self.ignore_prefix = CONFIG.get('uploader.ignore.prefix', None)
+        if self.ignore_prefix is not None and type(self.ignore_prefix) == str:
+            self.ignore_prefix = [self.ignore_prefix]  
+            
+    def is_in_ignore_lists(self, filename:str) -> bool:
+        if self.ignore_suffix is not None and type(self.ignore_suffix) in (tuple, list):
+            for prefix in self.ignore_suffix:
+                if filename.endswith(prefix):
+                    return True
+        if self.ignore_prefix is not None and type(self.ignore_prefix) in (tuple, list):
+            for prefix in self.ignore_prefix:
+                if filename.startswith(prefix):
+                    return True        
+        return False
     # The callback function when a create event occurs
     def on_created(self, event:FileSystemEvent):
         pass
@@ -44,11 +62,18 @@ class CustomFileSystemEventHandler(FileSystemEventHandler):
             # if the event is from a modified file
             local_path = event.src_path
             filename = file_tools.get_filename(local_path)
+            if self.is_in_ignore_lists(filename):
+                return
             parent_path = file_tools.get_parent(local_path)
             sub_path = parent_path[len(self.filestore_path) + 1:]  # the sub_path cannot start with '/' for os.path.join to work
             remote_path = os.path.join(self.remote_filestore_path, sub_path)
             DAO.add_upload_file(local_path, filename, remote_path, int(time.time()) + CONFIG.get('uploader.delay', self.uploader_delay))
-
+    # the callback function when a file is deleted
+    def on_deleted(self, event:FileSystemEvent):
+        if not event.is_directory:
+            # if the event is from a file
+            local_path = event.src_path
+            DAO.remove_upload_file(local_path)
 
 class GDriveUploader(object):
     def __init__(self):

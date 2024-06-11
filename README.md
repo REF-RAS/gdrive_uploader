@@ -89,13 +89,23 @@ uploader.mode: web   # web or headless
 Determines whether the bagfile capturer provides a web interface (`web`) or no interface (`headless`). Other values will cause an error.
 
 ```yaml
-# filestore path
-uploader.filestore.local: /home/qcr/Insync/Bagfiles
+# the local filestore path where new or modified files are uploaded
+uploader.filestore.local: /home/qcr/Bagfiles
+# the target folder on the google drive
 uploader.filestore.remote: /Bagfiles
 ```
 The `uploader.filestore.local` specifies the local directory where new files are to be detected and uploaded. Note that the uploader is only interested in _new_ files. However, touching the files can force the uploader to consider them as new files.
 
 The `uploader.filestore.remote` specifies the target folder to receive the uploaded file on Google Drive.
+
+```yaml
+# exclude files with suffixes and prefixes
+uploader.ignore.suffix:
+  - .active
+uploader.ignore.prefix:
+  - '~'
+```
+The two yaml keys, `uploader.ignore.suffix` and `uploader.ignore.prefix`, specify a list of suffixes and prefixes of filenames that will be ignored. To define more than one suffix or prefix, add more lines under the key as a list. 
 
 ```yaml
 uploader.web.host: 0.0.0.0
